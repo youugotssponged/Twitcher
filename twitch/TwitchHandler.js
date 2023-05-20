@@ -70,7 +70,7 @@ async function GetStreamData(channelName, clientID, authkey) {
 }
 
 
-export default async function CheckStreamerStatus(PostToSocialMediasCallback, prevStreamStatus, config) {
+export default async function CheckStreamerStatus(PostToSocialMediasCallback, prevStreamStatus, config, lastOnlineTime) {
     const messages = config.messages;
     const authToken = await GetAuthKey(config.twitch_clientID, config.twitch_secret);
     const channelData = await GetChannelData(config.ChannelName, config.twitch_clientID, authToken);
@@ -92,7 +92,7 @@ export default async function CheckStreamerStatus(PostToSocialMediasCallback, pr
             const timeSinceLastOnline = currentTime - lastOnlineTime;
             const minutesToWaitBeforeEndOfStreamMessage = config.minutesToWaitBeforeEndOfStreamMessage * 60 * 1000;
 
-            fs.writeFileSync("./info/lastOnlineTime.txt", new Date().getTime());
+            fs.writeFileSync("./info/lastOnlineTime.txt", `${new Date().getTime()}`);
             console.log("Writing current time to lastOnlineTime.txt");
 
             if (config.enableEndOfStreamMessage && timeSinceLastOnline <= minutesToWaitBeforeEndOfStreamMessage) {

@@ -120,10 +120,10 @@ function PreFlightChecks() {
     }
 
     lastIntervalChecked = Date.now();
-    await CheckStreamerStatus(PostToSocialMediasCallback, prevStreamStatus, config);
+    await CheckStreamerStatus(PostToSocialMediasCallback, prevStreamStatus, config, lastOnlineTime);
 
     setInterval(async () => {
         lastIntervalChecked = Date.now();
-        await CheckStreamerStatus(PostToSocialMediasCallback, prevStreamStatus, config);
+        await CheckStreamerStatus(PostToSocialMediasCallback, prevStreamStatus, config, lastOnlineTime);
     }, checkInterval);
 }());
