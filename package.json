@@ -1,0 +1,19 @@
+{
+  "name": "twitcher",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A tool that monitors when you go live on twitch and automatigically post to social media platforms to notify that you have went live.",
+  "main": "twitcher.js",
+  "scripts": {
+    "twitcher": "node twitcher.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "youugotssponged",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.2.0",
+    "mastodon-api": "^1.3.0",
+    "node-fetch": "^3.3.1",
+    "request": "^2.88.2"
+  }
+}
