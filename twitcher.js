@@ -9,20 +9,20 @@ let lastIntervalChecked;
 
 function KeyboardCallback(key) {
     // show time since last interval
-    if(key === 't' || key === 'T') {
+    if (key === 't' || key === 'T') {
         // show time since last interval
         const diff = Math.abs(new Date(lastIntervalChecked) - Date.now());
-        if((diff/1000) < 60){
-            const seconds = Math.floor((diff/1000));
+        if ((diff / 1000) < 60) {
+            const seconds = Math.floor((diff / 1000));
             console.log(chalk.yellow(`[INFO] It has been ${seconds} seconds since the last interval check`));
         } else {
-            const minutes = Math.floor((diff/1000)/60);
+            const minutes = Math.floor((diff / 1000) / 60);
             console.log(chalk.yellow(`[INFO] It has been ${minutes} minute(s) since the last interval check`));
         }
     }
 
     // Kill process
-    if(key === 'q' || key === 'Q') {
+    if (key === 'q' || key === 'Q') {
         console.log(chalk.red("Exiting..."));
         process.exit();
     }
@@ -31,50 +31,57 @@ function KeyboardCallback(key) {
 function PreFlightChecks() {
     let isSuccessful = true;
     try {
-        
+        let filesExist = true;
+        console.log(chalk.blue("Running Pre-flight checks..."));
+
         console.log(chalk.blue("Loading config.json"));
         config = JSON.parse(fs.readFileSync('./config.json'));
         console.log(chalk.green("config.json loaded!"));
 
-        let filesExist = true;
-        console.log(chalk.blue("Running Pre-flight checks..."));
+        if (!fs.existsSync("./info")) {
+            console.log(chalk.cyanBright("Creating /info directory"));
+            fs.mkdirSync("./info");
+            console.log(chalk.green("Successfully created /info directory"));
+        }
 
         if (!fs.existsSync("./info/lastPostTime.txt")) {
             console.log(chalk.cyanBright("Creating lastPostTime.txt in /info"));
-            fs.openSync("./info/lastPostTime.txt", 'w');
+            fs.closeSync(fs.openSync("./info/lastPostTime.txt", 'w'));
             console.log(chalk.green("Successfully created lastPostTime.txt"));
             filesExist = false;
         }
 
         if (!fs.existsSync("./info/streamStatus.txt")) {
             console.log(chalk.cyanBright("Creating streamStatus.txt in /info"));
-            fs.openSync("./info/streamStatus.txt", 'w');
+            fs.closeSync(fs.openSync("./info/streamStatus.txt", 'w'));
             console.log(chalk.green("Successfully created streamStatus.txt"));
             filesExist = false;
         }
 
         if (!fs.existsSync("./info/lastOnlineTime.txt")) {
             console.log(chalk.cyanBright("Creating lastOnlineTime.txt in /info"));
-            fs.openSync("./info/lastOnlineTime.txt", 'w');
+            fs.closeSync(fs.openSync("./info/lastOnlineTime.txt", 'w'));
             console.log(chalk.green("Successfully created lastOnlineTime.txt"));
             filesExist = false;
         }
 
-        if (filesExist)
+        // Set up stdin calls
+        let commandHooksSuccessful = true;
+        try {
+            console.log(chalk.blue("Setting up stdin hooks..."));
+            stdin = process.stdin;
+            stdin.setRawMode(true);
+            stdin.setEncoding('utf8');
+            stdin.on('data', KeyboardCallback);
+            console.log(chalk.green("stdin hooks have been successfully set up!"));
+        } catch (error) {
+            commandHooksSuccessful = false;
+            console.log(chalk.redBright(`An error has occured during pre-flight checks, error was ${error}`));
+        }
+        if (filesExist && commandHooksSuccessful)
             console.log(chalk.green("Pre-flight checks successful!"));
         else
             console.log(chalk.green("Pre-flight check complete, info files have now generated"));
-            
-        // Set up stdin calls
-        console.log(chalk.blue("Setting up stdin hooks..."));
-        stdin = process.stdin;
-        stdin.setRawMode(true);
-        stdin.setEncoding('utf8');
-        stdin.on('data', KeyboardCallback);
-        console.log(chalk.green("stdin hooks have been successfully set up!"));
-
-        console.log(chalk.yellow("\n[HINT] - REMEMBER - T to check time since last interval check"));
-        console.log(chalk.yellow("[HINT] - REMEMBER - Q to kill process\n"));
 
         return isSuccessful;
     }
@@ -87,9 +94,11 @@ function PreFlightChecks() {
 
 (async function () {
 
-    if(!PreFlightChecks()) return;
+    if (!PreFlightChecks()) return;
 
-    console.log(chalk.yellow(`Now running twitcher service for channel: ${config.ChannelName}`));
+    console.log(chalk.yellow(`\nNow running twitcher service for channel: ${config.ChannelName}`));
+    console.log(chalk.yellow("\n[HINT] - REMEMBER - T to check time since last interval check"));
+    console.log(chalk.yellow("[HINT] - REMEMBER - Q to kill process\n"));
 
     let lastPostTime = 0;
     let lastOnlineTime = 0;
