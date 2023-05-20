@@ -8,9 +8,6 @@
     "minutesToWaitBeforeEndOfStreamMessage": 10,
     "enableEndOfStreamMessage": true,
     "checkIntervalInMinutes": 10,
-    "twitch_stream_id": "",
-    "channels": "",
-    "authToken": "YOUR_TWITCH_AUTH_TOKEN",
     "messages": [
         "Streaming live now on Twitch with \"{streamTitle}\", come join the fun: {streamUrl}"
     ]
